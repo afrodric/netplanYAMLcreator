@@ -35,6 +35,7 @@
 
 <script>
 currentState ="network";
+recordState = ["network"];
 var netplantxt = "";
 var delButton = document.getElementById('buttonDel');
 var txtInput = document.getElementById('inputTxt');
@@ -45,8 +46,7 @@ var states = {
     nextAdd:"version",
     showDel:"none",
     showInput:"none",
-    showSelector:"none",
-    nextDel:"network"
+    showSelector:"none"
     },
   version:{ 
     textAdd:"Add version:2",
@@ -54,8 +54,7 @@ var states = {
     nextAdd:"ethernets",
     showDel:"none",
     showInput:"none",
-    showSelector:"none",
-    nextDel:"network"
+    showSelector:"none"
     },
   ethernets:{ 
     textAdd:"Add ethernets:",
@@ -63,8 +62,7 @@ var states = {
     nextAdd:"interfaces",
     showDel:"block",
     showInput:"none",
-    showSelector:"none",
-    nextDel:"version"
+    showSelector:"none"
     },
   interfaces:{ 
     textAdd:"Add interface:",
@@ -72,8 +70,7 @@ var states = {
     nextAdd:"devproperties",
     showDel:"block",
     showInput:"block",
-    showSelector:"none",
-    nextDel:"ethernets"
+    showSelector:"none"
     },
   devproperties:{ 
     textAdd:"Add dev properties:",
@@ -81,8 +78,7 @@ var states = {
     nextAdd:"interfaces",
     showDel:"block",
     showInput:"none",
-    showSelector:"block",
-    nextDel:"ethernets"
+    showSelector:"block"
     },
 };
 var devproperoption = ["addresses:", "nameservers:", "routes:"];
@@ -107,8 +103,9 @@ function newStateAdd() {
     }    
     netplantxt = netplantxt + lineToAdd ;
     document.getElementById("netplanString").innerHTML = netplantxt;
-    //Apply new state and forms    
+    //Apply new state record and  update forms    
     currentState=states[currentState]["nextAdd"];
+    recordState.push(currentState);
     document.getElementById("state").innerHTML=currentState;    
     document.getElementById("buttonAdd").firstChild.data  = states[currentState]["textAdd"];
     delButton.style.display = states[currentState]["showDel"];
@@ -121,7 +118,8 @@ function newStateDel() {
     netplantxt = netplantxt.slice(0, netplantxt.lastIndexOf("\n"));
     document.getElementById("netplanString").innerHTML = netplantxt; 
     //Update state and forms 
-    currentState=states[currentState]["nextDel"];
+    recordState.pop();
+    currentState=recordState[recordState.length-1];
     document.getElementById("state").innerHTML=currentState;    
     document.getElementById("buttonAdd").firstChild.data  = states[currentState]["textAdd"];
     delButton.style.display = states[currentState]["showDel"];
