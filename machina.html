@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div class="split left">
+  <div class="centered">
+    <h2>netplan YAML generator</h2>
+    <h3>current state</h3>
+    <p id="state">init</p>    
+    <button id="buttonAdd" type="button" onclick="newStateAdd()">Change State</button>
+    <input type="text" id="inputTxt" placeholder="eth...">
+    <select id="selector">
+    <option>Choose</option>
+    </select>
+    <h3>Delete last line if is wrong</h3>
+    <button id="buttonDel" type="button" onclick="newStateDel()">Delete last</button>
+ </div>
+</div>
+
+<div class="split right">
+  <div class="centered">
+
+    <p>netplan file </p>
+
+  <pre>
+     <code id="netplanString"></code>
+  </pre>
+ 
+
+  </div>
+</div>
+
+<script>
+currentState ="network";
+var netplantxt = "";
+var delButton = document.getElementById('buttonDel');
+var txtInput = document.getElementById('inputTxt');
+var states = {
+  network:{ 
+    textAdd:"Add network:",
+    stringAdd: "\nnetwork:",
+    nextAdd:"version",
+    showDel:"none",
+    showInput:"none",
+    showSelector:"none",
+    nextDel:"network"
+    },
+  version:{ 
+    textAdd:"Add version:2",
+    stringAdd: "\nversion:2", 
+    nextAdd:"ethernets",
+    showDel:"none",
+    showInput:"none",
+    showSelector:"none",
+    nextDel:"network"
+    },
+  ethernets:{ 
+    textAdd:"Add ethernets:",
+    stringAdd: "\nethernets:",
+    nextAdd:"interfaces",
+    showDel:"block",
+    showInput:"none",
+    showSelector:"none",
+    nextDel:"version"
+    },
+  interfaces:{ 
+    textAdd:"Add interface:",
+    stringAdd: "readInput",
+    nextAdd:"devproperties",
+    showDel:"block",
+    showInput:"block",
+    showSelector:"none",
+    nextDel:"ethernets"
+    },
+  devproperties:{ 
+    textAdd:"Add dev properties:",
+    stringAdd: "readSelector",
+    nextAdd:"interfaces",
+    showDel:"block",
+    showInput:"none",
+    showSelector:"block",
+    nextDel:"ethernets"
+    },
+};
+var devproperoption = ["addresses:", "nameservers:", "routes:"];
+
+loadSelector(devproperoption);
+
+document.getElementById("netplanString").innerHTML = netplantxt; 
+document.getElementById("buttonAdd").firstChild.data  = states[currentState]["textAdd"];
+delButton.style.display = "none";
+txtInput.style.display = "none";
+selector.style.display = "none";
+
+function newStateAdd() {
+    //Add line with correspondant data
+    var lineToAdd = "";
+    if (states[currentState]["stringAdd"]==="readInput"){
+    lineToAdd= "\n  " + document.getElementById("inputTxt").value;
+    } else if (states[currentState]["stringAdd"]==="readSelector") {
+    lineToAdd="\n    "  +  document.getElementById("selector").options[document.getElementById("selector").selectedIndex].text;
+    } else {
+    lineToAdd=states[currentState]["stringAdd"]
+    }    
+    netplantxt = netplantxt + lineToAdd ;
+    document.getElementById("netplanString").innerHTML = netplantxt;
+    //Apply new state and forms    
+    currentState=states[currentState]["nextAdd"];
+    document.getElementById("state").innerHTML=currentState;    
+    document.getElementById("buttonAdd").firstChild.data  = states[currentState]["textAdd"];
+    delButton.style.display = states[currentState]["showDel"];
+    txtInput.style.display = states[currentState]["showInput"];
+    selector.style.display = states[currentState]["showSelector"];
+}
+
+function newStateDel() {
+    //delete line and write the new string
+    netplantxt = netplantxt.slice(0, netplantxt.lastIndexOf("\n"));
+    document.getElementById("netplanString").innerHTML = netplantxt; 
+    //Update state and forms 
+    currentState=states[currentState]["nextDel"];
+    document.getElementById("state").innerHTML=currentState;    
+    document.getElementById("buttonAdd").firstChild.data  = states[currentState]["textAdd"];
+    delButton.style.display = states[currentState]["showDel"];
+    txtInput.style.display = states[currentState]["showInput"];
+    selector.style.display = states[currentState]["showSelector"];
+}
+
+function loadSelector(options) {
+var select = document.getElementById("selector");
+for(var i = 0; i < options.length; i++) {
+    var opt = options[i];
+    var el = document.createElement("option");
+    el.textContent = opt;
+    el.value = opt;
+    select.appendChild(el);
+};
+}
+</script>
+
+</body>
+</html>
+
